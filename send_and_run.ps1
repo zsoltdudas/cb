@@ -17,7 +17,7 @@
 #>
 
 
-param ([string]$SourcePath, [String] $vmName, [String] $server, [String] $ip)
+param ([string]$SourcePath, [String] $vmName, [String] $server)
 
 
 function GetIPv4ViaKVP( [String] $vmName, [String] $server)
