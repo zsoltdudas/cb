@@ -23,17 +23,7 @@
 
 ########################################################################
 #
-# CORE_StressReloadModules.sh
-# Description:
-#    This script will first check the existence of Hyper-V kernel modules.
-#    Then it will reload the modules 500 times to stress the system.
-#    It also checks that hyperv_fb cannot be unloaded.
-#    When done it will bring up the eth0 interface and check again for
-#    the presence of Hyper-V modules.
-#
-#    To pass test parameters into test cases, the host will create
-#    a file named constants.sh. This file contains one or more
-#    variable definition.
+# Script introduction TO DO
 #
 ################################################################
 
@@ -379,7 +369,7 @@ if is_fedora ; then
 elif is_ubuntu ; then
     echo "Starting the configuration..."
     
-    PACK_LIST=(openssh-server tofrodos at stressapptest bridge-utils btrfs-tools xfsprogs linux-cloud-tools-common linux-tools-`uname -r` linux-cloud-tools-`uname -r`)
+    PACK_LIST=(openssh-server tofrodos dos2unix ntp open-iscsi iperf gpm vlan iozone3 at stressapptest bridge-utils btrfs-tools xfsprogs linux-cloud-tools-common linux-tools-`uname -r` linux-cloud-tools-`uname -r`)
     for item in ${PACK_LIST[*]}
     do
         echo "Starting to install $item... "
@@ -441,24 +431,7 @@ fi
 rsa_keys rhel5_id_rsa
 configure_ssh
 
-echo "Restarting ssh service..."
+echo "Disable quiet mode in grub"
 if is_fedora || is_suse ; then
     perl -pi -e "s/quiet//g" /etc/grub.conf
-    service sshd restart
-else
-    service ssh restart
 fi
-if [ $? -eq 0 ]
-then
-    echo "ssh service was successfully restarted." >> summary.log
-else
-    echo "Error: ssh service failed to restart." >> summary.log
-fi
-
-reboot
-
- #else # other distro's
-  #   LogMsg "Distro not suported. Aborting"
-  #   UpdateTestState $ICA_TESTABORTED
-  #   exit 10
-# fi
