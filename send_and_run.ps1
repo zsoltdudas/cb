@@ -261,6 +261,21 @@ function GetIPv4([String] $vmName, [String] $server)
 }
 
 
+function GetIpFromKeyboard (){   
+    do{
+        $IP = Read-Host "Enter the IP of the virtual machine"
+
+        if($IP -match '[0-9]+[0-9]*[0-9]*\.[0-9]+[0-9]*[0-9]*\.[0-9]+[0-9]*[0-9]*\.[0-9]+[0-9]*[0-9]*') {
+           return $IP
+        }else{
+            write-output "$IP is not an ip"
+        }
+    }
+    while(1)
+}
+
+
+
 function SendToVM([string]$SourcePath, [String] $vmName, [String] $server, [String] $IP){
     Write-Host "IP:$IP"
     ./pscp.exe -pw Passw0rd $SourcePath"\AIO.sh" root@$IP
@@ -274,16 +289,18 @@ function RunScriptOnVM($vmName, $server, $IP){
     ./plink.exe -pw Passw0rd root@$IP /root/AIO.sh
 }
 
-Write-Host "IP:$ip"
-if ( $ip ){
-    $ipAux = "$ip" + ":"
+
+
+#   CreateVM
+#   StartVM
+
+$ip = GetIPv4 $vmName $server
+
+if( -not $ip ){
+    $ip = GetIpFromKeyboard
 }
-else { 
-    $ipAux = GetIpv4 $vmName $server
-    $ipAux = "$ipAux" + ":"
-}
+
+$ipAux = "$ipAux" + ":"
+
 SendToVM $SourcePath $vmName $server $ipAux
-RunScriptOnVM $vmName $server $ipAux
-
-
-
+RunScriptOnVM $vmName $server $ip
