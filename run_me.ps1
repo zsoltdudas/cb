@@ -1,6 +1,6 @@
 <#
     .Synopsis
-        This script sends a file to a VM and runs it.
+        This script sends a file to a VM and runs it. Make sure you have the script and pscp.exe and plink.exe in the same folder.
     .Description
         This script will get the IP from the guest machine and then it will 
          use pscp to send the script and keys. plink will be used to run the AIO script. 
