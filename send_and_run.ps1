@@ -292,7 +292,31 @@ function RunScriptOnVM($vmName, $server, $IP){
 
 
 #   CreateVM
+param ([string]$vhdpath="", [string]$name="New-VM", [int64]$mem = 2147483648, [int]$gen=1, [string]$locpath="C:\Hyper-V")
+
+Function CreateVM([string]$vhdpath, [string]$name, [int64]$mem, [int]$gen, [string]$locpath){
+    if(($vhdpath.len -eq 0)){
+        write-output "-vhdpath required"
+        exit
+    }
+    if( -not(Test-Path -path $vhdpath)){
+        write-output "Invalid VHD path"
+        exit
+    }
+
+    New-VM -Name $name -MemoryStartupBytes $mem -Generation $gen -VHDPath $vhdpath -Path $locpath
+    SET-VMProcessor -VMname $name -count 2
+    enable-vmintegrationservice -vmname $name -name "Guest Service Interface"
+    
+}
+
+write-output "Creating the new virtual machine..."
+CreateVM $vhdpath $name $mem $gen $locpath
+
 #   StartVM
+write-output "Starting the virtual machine..."
+Start-VM -Name $name
+
 
 $ip = GetIPv4 $vmName $server
 
