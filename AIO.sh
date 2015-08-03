@@ -346,9 +346,9 @@ if is_fedora ; then
 
     cat /etc/redhat-release | grep 6.0
     if [ $? -eq 0 ];then
-        rhnreg_ks --username lic_interop --password pass@word1
+        rhnreg_ks --username username --password password
     else
-        subscription-manager register --username lic_interop --password pass@word1
+        subscription-manager register --username username --password password
         subscription-manager attach --auto
     fi
 
