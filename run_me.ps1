@@ -284,8 +284,10 @@ function SendToVM([string]$SourcePath, [String] $vmName, [String] $server, [Stri
 
 
 function RunScriptOnVM($vmName, $server, $IP){
+    $username = Read-Host "Enter the username to register the system. (Skip it if your system is not Fedora)"
+    $password = Read-Host "Enter the password"
     ./plink.exe -pw Passw0rd root@$IP "chmod +x /root/AIO.sh"
-    ./plink.exe -pw Passw0rd root@$IP /root/AIO.sh
+    ./plink.exe -pw Passw0rd root@$IP "/root/AIO.sh $username $password"
 }
 
 
