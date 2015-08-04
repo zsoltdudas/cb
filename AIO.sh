@@ -344,10 +344,11 @@ if is_fedora ; then
         sed -i -e 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/selinux/config
     fi
 
+    
+    username=$1
+    password=$2
     cat /etc/redhat-release | grep 6.0
     if [ $? -eq 0 ];then
-        username=$1
-        password=$2
         rhnreg_ks --username $username --password $password
     else
         subscription-manager register --username $username --password $password
