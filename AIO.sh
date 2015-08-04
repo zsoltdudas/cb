@@ -345,9 +345,9 @@ if is_fedora ; then
     fi
 
     cat /etc/redhat-release | grep 6.0
-    username = $1
-    password = $2
     if [ $? -eq 0 ];then
+        username=$1
+        password=$2
         rhnreg_ks --username $username --password $password
     else
         subscription-manager register --username $username --password $password
