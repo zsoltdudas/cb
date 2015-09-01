@@ -39,7 +39,7 @@
                 <file>nfs.log</file>
             </uploadFiles>
             <testParams>
-                <param>TESTS=(tcp rpc)</param>
+                <param>TESTS=(tcp rpc multicast sctp nfs)</param>
                 <param>LTP_SERVER_IP=10.8.0.55</param>
                 <param>SSH_PRIVATE_KEY=rhel5_id_rsa</param>
                 <param>SERVER_USERNAME=root</param>
