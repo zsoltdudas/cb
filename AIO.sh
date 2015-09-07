@@ -256,17 +256,17 @@ function configure_ssh(){
 
 function install_lis(){
     umount /media
-    echo "Mounting drive..."
+    echo "Mounting drive..." >> summary.log
     mount /dev/cdrom /media
     if [ $? -eq 0 ]; then
         echo "cdrom was successfully mounted" >> summary.log 
         cd /media
         rpm -qa | grep microsoft
         if [ $? -eq 0 ]; then
-            echo "Lis drivers are on machine, we'll upgrade"
+            echo "Lis drivers are on machine, we'll upgrade" >> summary.log
             ./upgrade.sh
         else
-            echo "Lis drivers aren't on machine, we'll install them"
+            echo "Lis drivers aren't on machine, we'll install them" >> summary.log
             ./install.sh
         fi
         cd ~
@@ -281,10 +281,10 @@ function install_lis(){
             cd /media
             rpm -qa | grep microsoft
             if [ $? -eq 0 ]; then
-                echo "Lis drivers are on machine, we'll upgrade"
+                echo "Lis drivers are on machine, we'll upgrade" >> summary.log
                 ./upgrade.sh
             else
-                echo "Lis drivers aren't on machine, we'll install them"
+                echo "Lis drivers aren't on machine, we'll install them" >> summary.log
                 ./install.sh
             fi
         else
@@ -303,11 +303,13 @@ function verify_install (){
 }
 
 function install_stressapptest(){
+	echo "Installing stressapptest..." >> summary.log
     svn checkout http://stressapptest.googlecode.com/svn/trunk/ stressapptest
     cd stressapptest
     ./configure
     make
     make install
+    verify_install $? stressapptest
     cd ~   
 }
 
@@ -363,7 +365,6 @@ if is_fedora ; then
         verify_install $? $item
     done
  
-    echo "Installing stressapptest..."
     install_stressapptest
 
     echo "Installing lis and mounting..."
@@ -372,7 +373,7 @@ if is_fedora ; then
 elif is_ubuntu ; then
     echo "Starting the configuration..."
     
-    PACK_LIST=(openssh-server tofrodos dos2unix ntp open-iscsi iperf gpm vlan iozone3 at stressapptest bridge-utils btrfs-tools xfsprogs linux-cloud-tools-common linux-tools-`uname -r` linux-cloud-tools-`uname -r`)
+    PACK_LIST=(openssh-server tofrodos dosfstools dos2unix ntp open-iscsi iperf gpm vlan iozone3 at stressapptest bridge-utils btrfs-tools xfsprogs linux-cloud-tools-common linux-tools-`uname -r` linux-cloud-tools-`uname -r`)
     for item in ${PACK_LIST[*]}
     do
         echo "Starting to install $item... "
@@ -381,14 +382,13 @@ elif is_ubuntu ; then
     done   
 
 elif is_suse ; then
-    SUPPORTEDOS=-1
-    cat /etc/SuSE-release | grep 12
-    if [ $? -eq 0 ]; then
-        echo "Installing dependencies for SLES 12"
-        zypper ar --name "openSUSE-12.1 OSS" http://ftp5.gwdg.de/pub/opensuse/discontinued/distribution/12.1/repo/oss/ SuSE12.1
-        zypper ar --name "openSUSE-12.1 NON-OSS" http://ftp5.gwdg.de/pub/opensuse/discontinued/distribution/12.1/repo/non-oss/ SuSE12.1-nonoss
+	# SLES ISO must be mounted for SVN installer to work
+
+    if [ $os_RELEASE -eq 12 ]; then
+        echo "Installing dependencies for SLES 12" >> summary.log
+        zypper ar --name "openSUSE-12 OSS" http://ftp5.gwdg.de/pub/opensuse/discontinued/distribution/12.1/repo/oss/ SuSE12
+        zypper ar --name "openSUSE-12 NON-OSS" http://ftp5.gwdg.de/pub/opensuse/discontinued/distribution/12.1/repo/non-oss/ SuSE12-nonoss
         zypper --no-gpg-checks refresh
-        SUPPORTEDOS=0
 
         expect -c "
             spawn zypper in subversion
@@ -398,37 +398,29 @@ elif is_suse ; then
             send \"y\r\"
             interact
         "
+        verify_install $? SVN
 
-        echo "Installing stressapptest..."
-        install_stressapptest
-    fi
-    cat /etc/SuSE-release | grep 11
-    if [ $? -eq 0 ]; then
-        zypper ar --name "openSUSE-11.4 OSS" http://ftp5.gwdg.de/pub/opensuse/discontinued/distribution/11.4/repo/oss/ SuSE11.4
-        zypper ar --name "openSUSE-11.4 NON-OSS" http://ftp5.gwdg.de/pub/opensuse/discontinued/distribution/11.4/repo/non-oss/ SuSE11.4-nonoss
+    elif [ $os_RELEASE -eq 11 ]; then
+    	echo "Installing dependencies for SLES 11" >> summary.log
+        zypper ar --name "openSUSE-11 OSS" http://ftp5.gwdg.de/pub/opensuse/discontinued/distribution/11.4/repo/oss/ SuSE11
+        zypper ar --name "openSUSE-11 NON-OSS" http://ftp5.gwdg.de/pub/opensuse/discontinued/distribution/11.4/repo/non-oss/ SuSE11-nonoss
         zypper --no-gpg-checks refresh
-        SUPPORTEDOS=0
+
         zypper --non-interactive in subversion
-        if [ $? -eq 0 ]; then
-            echo "SVN was successfully installed."
-        else
-            echo "Error: Failed to install SVN"
-        fi
-
-        echo "Installing stressapptest..."
-        install_stressapptest
-    fi
-    if [ $SUPPORTEDOS -eq -1 ]; then
-            echo "ERROR: Unsupported version of SLES!"
+        verify_install $? SVN
+    else
+    	echo "ERROR: Unsupported version of SLES!" >> summary.log
     fi
 
-    echo "Starting to install at..."
-    zypper --non-interactive in at
-    verify_install $? at
+    PACK_LIST=(at dos2unix dosfstools)
+    for item in ${PACK_LIST[*]}
+    do
+        echo "Starting to install $item... " >> summary.log
+        zypper --non-interactive in $item 
+        verify_install $? $item
+    done
 
-    echo "Starting to install dos2unix..."
-    zypper --non-interactive in dos2unix
-    verify_install $? dos2unix
+    install_stressapptest
 fi
 
 rsa_keys rhel5_id_rsa
