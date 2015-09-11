@@ -313,6 +313,27 @@ function install_stressapptest(){
     cd ~   
 }
 
+function configure_grub(){
+	if is_ubuntu ; then
+		sed -i -e 's/DEFAULT=""/DEFAULT="console=tty0 console=ttyS1 crashkernel=256M@128M"/g' /etc/default/grub
+		update-grub	
+	elif is_fedora ; then
+		if [ $os_RELEASE -eq 7 ] ; then
+			sed -i -e 's/crashkernel=auto/crashkernel=256M@128M console=tty0 console=ttyS1/g' /etc/default/grub
+			grub2-mkconfig -o /etc/grub2.cfg
+		elif [ $os_RELEASE -eq 6 ] ; then
+			sed -i -e 's/crashkernel=auto/crashkernel=256M@128M console=tty0 console=ttyS1/g' /boot/grub/grub.conf
+		fi	
+	elif is_suse ; then
+		if [ $os_RELEASE -eq 12 ] ; then
+			sed -i -e 's/218M-:109M/256M@128M console=tty0 console=ttyS1/g' /etc/default/grub
+			grub2-mkconfig -o /etc/grub2.cfg
+		elif [ $os_RELEASE -eq 11 ]	; then
+			sed -i -e 's/256M-:128M/256M@128M console=tty0 console=ttyS1/g' /boot/grub/menu.lst
+		fi	
+	fi
+}
+
 #######################################################################
 #
 # Main script body
@@ -423,6 +444,7 @@ elif is_suse ; then
     install_stressapptest
 fi
 
+configure_grub
 rsa_keys rhel5_id_rsa
 configure_ssh
 
