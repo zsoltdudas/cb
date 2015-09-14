@@ -314,6 +314,7 @@ function install_stressapptest(){
 }
 
 function configure_grub(){
+	echo "Configuring GRUB..." >> summary.log
 	if is_ubuntu ; then
 		sed -i -e 's/DEFAULT=""/DEFAULT="console=tty0 console=ttyS1 crashkernel=256M@128M"/g' /etc/default/grub
 		update-grub	
@@ -357,8 +358,7 @@ if is_fedora ; then
         echo "ERROR: iptables cannot be turned off" >> summary.log
     fi
 
-    cat /etc/redhat-release | grep 6
-    if [ $? -eq 0 ]; then
+    if [ $os_RELEASE -eq 6 ]; then
         echo "Changing ONBOOT..."
         sed -i -e 's/ONBOOT=no/ONBOOT=yes/g' /etc/sysconfig/network-scripts/ifcfg-eth0 
         echo "Turning off selinux..." 
@@ -367,17 +367,27 @@ if is_fedora ; then
         sed -i -e 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/selinux/config
     fi
 
-    
+    echo "Registering the system..." >> summary.log
+
+    if [ $# -ne 2 ]; then
+    	echo "ERRROR: Incorrect number of arguments!" >> summary.log
+    	echo "Usage: ./AIO.sh username password" >> summary.log
+	fi
     username=$1
     password=$2
-    cat /etc/redhat-release | grep 6.0
-    if [ $? -eq 0 ];then
+
+    echo "os_RELEASE: $os_RELEASE" >> summary.log
+    echo "os_UPDATE: $os_UPDATE" >> summary.log
+    if [[ $os_RELEASE == "6.0" ]] || \
+       [[ $os_RELEASE -eq 6 ]] && \
+       [[ $os_RELEASE -eq 0 ]]; then
         rhnreg_ks --username $username --password $password
-    else
+    else 
         subscription-manager register --username $username --password $password
         subscription-manager attach --auto
     fi
 
+    echo "Installing packages..." >> summary.log
     PACK_LIST=(openssh-server dos2unix at net-tools gpm bridge-utils btrfs-progs xfsprogs ntp crash libaio-devel nano kexec-tools)
     for item in ${PACK_LIST[*]}
     do
