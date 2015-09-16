@@ -321,16 +321,20 @@ function configure_grub(){
 	elif is_fedora ; then
 		if [ $os_RELEASE -eq 7 ] ; then
 			sed -i -e 's/crashkernel=auto/crashkernel=256M@128M console=tty0 console=ttyS1/g' /etc/default/grub
-			grub2-mkconfig -o /etc/grub2.cfg
+			perl -pi -e "s/quiet//g" /etc/default/grub
+            grub2-mkconfig -o /etc/grub2.cfg
 		elif [ $os_RELEASE -eq 6 ] ; then
 			sed -i -e 's/crashkernel=auto/crashkernel=256M@128M console=tty0 console=ttyS1/g' /boot/grub/grub.conf
-		fi	
+		    perl -pi -e "s/quiet//g" /boot/grub/grub.conf
+        fi	
 	elif is_suse ; then
 		if [ $os_RELEASE -eq 12 ] ; then
 			sed -i -e 's/218M-:109M/256M@128M console=tty0 console=ttyS1/g' /etc/default/grub
-			grub2-mkconfig -o /etc/grub2.cfg
+			perl -pi -e "s/quiet//g" /etc/default/grub
+            grub2-mkconfig -o /etc/grub2.cfg
 		elif [ $os_RELEASE -eq 11 ]	; then
 			sed -i -e 's/256M-:128M/256M@128M console=tty0 console=ttyS1/g' /boot/grub/menu.lst
+            perl -pi -e "s/splash=silent//g" /boot/grub/menu.lst
 		fi	
 	fi
 }
@@ -457,8 +461,3 @@ fi
 configure_grub
 rsa_keys rhel5_id_rsa
 configure_ssh
-
-echo "Disable quiet mode in grub"
-if is_fedora || is_suse ; then
-    perl -pi -e "s/quiet//g" /etc/grub.conf
-fi
