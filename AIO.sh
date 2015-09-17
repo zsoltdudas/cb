@@ -425,8 +425,7 @@ elif is_suse ; then
 
     if [ $os_RELEASE -eq 12 ]; then
         echo "Installing dependencies for SLES 12" >> summary.log
-        zypper ar --name "openSUSE-12 OSS" http://ftp5.gwdg.de/pub/opensuse/discontinued/distribution/12.1/repo/oss/ SuSE12
-        zypper ar --name "openSUSE-12 NON-OSS" http://ftp5.gwdg.de/pub/opensuse/discontinued/distribution/12.1/repo/non-oss/ SuSE12-nonoss
+        SUSEConnect -r E5A8D19E3BAAD8 -e mikelley@microsoft.com
         zypper --no-gpg-checks refresh
 
         expect -c "
@@ -441,10 +440,9 @@ elif is_suse ; then
 
     elif [ $os_RELEASE -eq 11 ]; then
     	echo "Installing dependencies for SLES 11" >> summary.log
-        zypper ar --name "openSUSE-11 OSS" http://ftp5.gwdg.de/pub/opensuse/discontinued/distribution/11.4/repo/oss/ SuSE11
-        zypper ar --name "openSUSE-11 NON-OSS" http://ftp5.gwdg.de/pub/opensuse/discontinued/distribution/11.4/repo/non-oss/ SuSE11-nonoss
+        suse_register -a regcode-sles=E5A8D19E3BAAD8 -a email=mikelley@microsoft.com -L /root/.suse_register.log
         zypper --no-gpg-checks refresh
-
+       
         zypper --non-interactive in subversion
         verify_install $? SVN
     else
