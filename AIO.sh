@@ -274,8 +274,9 @@ function install_lis(){
         echo "Mount failed. Proceeding to load cdrom drivers"
         cd /lib/modules/`uname -r`/kernel/drivers/ata
         insmod ata_piix.ko
+        verifyInsert=$?
         sleep 10
-        if [ $? == 0 ]; then
+        if [ verifyInsert -eq 0 ]; then
             echo "ata_piix.ko successfully loaded" >> summary.log
             mount /dev/cdrom /media
             cd /media
@@ -289,6 +290,9 @@ function install_lis(){
             fi
         else
             echo "Error: ata_piix.ko insert failed" >> summary.log
+            echo "Hyper-V Daemons will be installed by yum" >> summary.log
+            yum install hyperv-daemons -y
+            verify_install $? hyperv-daemons
         fi
         cd ~
     fi
