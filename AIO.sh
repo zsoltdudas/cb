@@ -318,13 +318,11 @@ function install_stressapptest(){
     cd ~   
 }
 
-function install_Stress(){
-    echo "Installing Stress..." >> summary.log
+function install_Stress_ng(){
+    echo "Installing Stress-ng..." >> summary.log
 
-    wget http://people.seas.harvard.edu/~apw/stress/stress-1.0.4.tar.gz
-    tar -zxvf stress-1.0.4.tar.gz
-    cd stress-1.0.4
-    ./configure
+    git clone https://github.com/ColinIanKing/stress-ng
+    cd stress-ng
     make
     make install
     verify_install $? Stress
@@ -410,7 +408,8 @@ if is_fedora ; then
     fi
 
     echo "Installing packages..." >> summary.log
-    PACK_LIST=(openssh-server dos2unix at net-tools gpm bridge-utils btrfs-progs xfsprogs ntp crash libaio-devel nano kexec-tools)
+    PACK_LIST=(openssh-server dos2unix at net-tools gpm bridge-utils btrfs-progs xfsprogs ntp crash 
+        libaio-devel libattr-devel keyutils-libs-devel nano kexec-tools)
     for item in ${PACK_LIST[*]}
     do
         echo "Starting to install $item... "
@@ -419,7 +418,6 @@ if is_fedora ; then
     done
  
     install_stressapptest
-    install_Stress
 
     echo "Installing lis and mounting..."
     install_lis
@@ -427,7 +425,8 @@ if is_fedora ; then
 elif is_ubuntu ; then
     echo "Starting the configuration..."
     
-    PACK_LIST=(openssh-server tofrodos dosfstools dos2unix ntp open-iscsi iperf gpm vlan iozone3 at stressapptest stress bridge-utils btrfs-tools xfsprogs linux-cloud-tools-common linux-tools-`uname -r` linux-cloud-tools-`uname -r`)
+    PACK_LIST=(openssh-server tofrodos dosfstools dos2unix ntp gcc open-iscsi iperf gpm vlan iozone3 at 
+        make libattr1-dev stressapptest git bridge-utils btrfs-tools libkeyutils-dev xfsprogs linux-cloud-tools-common linux-tools-`uname -r` linux-cloud-tools-`uname -r`)
     for item in ${PACK_LIST[*]}
     do
         echo "Starting to install $item... "
@@ -436,35 +435,50 @@ elif is_ubuntu ; then
     done   
 
 elif is_suse ; then
-	# SLES ISO must be mounted for SVN installer to work
+	# SLES ISO must be mounted for BETA releases
+
+    echo "Registering the system..." >> summary.log
+    if [ $# -ne 2 ]; then
+        echo "ERRROR: Incorrect number of arguments!" >> summary.log
+        echo "Usage: ./AIO.sh username password" >> summary.log
+    fi
+    username=$1
+    password=$2
 
     if [ $os_RELEASE -eq 12 ]; then
-        echo "Installing dependencies for SLES 12" >> summary.log
-        SUSEConnect -r E5A8D19E3BAAD8 -e mikelley@microsoft.com
+        echo "Registering SLES 11" >> summary.log
+        SUSEConnect -r $password -e $username
+        #Adding repo for SVN
+        zypper addrepo http://download.opensuse.org/repositories/devel:tools:scm:svn/SLE_12/devel:tools:scm:svn.repo
         zypper --no-gpg-checks refresh
-
-        expect -c "
-            spawn zypper in subversion
-            expect \"Choose from above solutions by number or cancel \[1\/2\/3\/4\/c\] \(c\)\: \"
-            send \"1\r\"
-            expect \"Continue? \[y\/n\/\? shows all options\] \(y\)\:\"
-            send \"y\r\"
-            interact
-        "
-        verify_install $? SVN
 
     elif [ $os_RELEASE -eq 11 ]; then
-    	echo "Installing dependencies for SLES 11" >> summary.log
-        suse_register -a regcode-sles=E5A8D19E3BAAD8 -a email=mikelley@microsoft.com -L /root/.suse_register.log
+    	echo "Registering SLES 11" >> summary.log
+        suse_register -a regcode-sles=$password -a email=$username -L /root/.suse_register.log
+        #Adding repo for SVN
+        zypper addrepo http://download.opensuse.org/repositories/devel:tools:scm:svn/SLE_11_SP4/devel:tools:scm:svn.repo
         zypper --no-gpg-checks refresh
        
-        zypper --non-interactive in subversion
-        verify_install $? SVN
     else
     	echo "ERROR: Unsupported version of SLES!" >> summary.log
     fi
 
-    PACK_LIST=(at dos2unix dosfstools)
+    echo "Installing dependencies for SLES 12" >> summary.log
+    #Installing dependencies for stress-ng to work
+    #First one needed is keyutils
+    wget https://build.opensuse.org/source/security/keyutils/keyutils-1.5.9.tar.bz2
+    tar -xjvf keyutils-1.5.9.tar.bz2
+    cd keyutils-1.5.9/
+    make
+    make install
+    cd ~
+    
+    #Second one is xattr. Just moving the file where stress-ng is searching for it
+    mkdir /usr/include/attr/
+    cp /usr/include/sys/xattr.h /usr/include/attr/xattr.h
+
+
+    PACK_LIST=(at dos2unix dosfstools git-core subversion)
     for item in ${PACK_LIST[*]}
     do
         echo "Starting to install $item... " >> summary.log
@@ -473,9 +487,9 @@ elif is_suse ; then
     done
 
     install_stressapptest
-    install_Stress
 fi
 
+install_Stress_ng
 configure_grub
 rsa_keys rhel5_id_rsa
 configure_ssh
