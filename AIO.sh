@@ -425,7 +425,7 @@ if is_fedora ; then
 elif is_ubuntu ; then
     echo "Starting the configuration..."
     
-    PACK_LIST=(openssh-server tofrodos dosfstools dos2unix ntp gcc open-iscsi iperf gpm vlan iozone3 at 
+    PACK_LIST=(kdump-tools openssh-server tofrodos dosfstools dos2unix ntp gcc open-iscsi iperf gpm vlan iozone3 at 
         make libattr1-dev stressapptest git bridge-utils btrfs-tools libkeyutils-dev xfsprogs linux-cloud-tools-common linux-tools-`uname -r` linux-cloud-tools-`uname -r`)
     for item in ${PACK_LIST[*]}
     do
