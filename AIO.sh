@@ -478,7 +478,7 @@ elif is_suse ; then
     cp /usr/include/sys/xattr.h /usr/include/attr/xattr.h
 
 
-    PACK_LIST=(at dos2unix dosfstools git-core subversion)
+    PACK_LIST=(at dos2unix dosfstools git-core subversion ntp)
     for item in ${PACK_LIST[*]}
     do
         echo "Starting to install $item... " >> summary.log
