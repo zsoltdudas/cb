@@ -436,7 +436,8 @@ elif is_ubuntu ; then
 
 elif is_suse ; then
 	# SLES ISO must be mounted for BETA releases
-
+    chkconfig atd on
+    service atd start
     echo "Registering the system..." >> summary.log
     if [ $# -ne 2 ]; then
         echo "ERRROR: Incorrect number of arguments!" >> summary.log
