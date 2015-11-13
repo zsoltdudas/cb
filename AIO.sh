@@ -409,7 +409,7 @@ if is_fedora ; then
 
     echo "Installing packages..." >> summary.log
     PACK_LIST=(openssh-server dos2unix at net-tools gpm bridge-utils btrfs-progs xfsprogs ntp crash 
-        libaio-devel libattr-devel keyutils-libs-devel nano kexec-tools device-mapper-multipath)
+        libaio-devel libattr-devel keyutils-libs-devel nano kexec-tools device-mapper-multipath expect)
     for item in ${PACK_LIST[*]}
     do
         echo "Starting to install $item... "
@@ -425,7 +425,7 @@ if is_fedora ; then
 elif is_ubuntu ; then
     echo "Starting the configuration..."
     
-    PACK_LIST=(kdump-tools openssh-server tofrodos dosfstools dos2unix ntp gcc open-iscsi iperf gpm vlan iozone3 at multipath-tools
+    PACK_LIST=(kdump-tools openssh-server tofrodos dosfstools dos2unix ntp gcc open-iscsi iperf gpm vlan iozone3 at multipath-tools expect
         make libattr1-dev stressapptest git bridge-utils btrfs-tools libkeyutils-dev xfsprogs linux-cloud-tools-common linux-tools-`uname -r` linux-cloud-tools-`uname -r`)
     for item in ${PACK_LIST[*]}
     do
@@ -479,7 +479,7 @@ elif is_suse ; then
     cp /usr/include/sys/xattr.h /usr/include/attr/xattr.h
 
 
-    PACK_LIST=(at dos2unix dosfstools git-core subversion ntp gcc gcc-c++)
+    PACK_LIST=(at dos2unix dosfstools git-core subversion ntp gcc gcc-c++ expect)
     for item in ${PACK_LIST[*]}
     do
         echo "Starting to install $item... " >> summary.log
