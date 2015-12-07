@@ -409,13 +409,17 @@ if is_fedora ; then
 
     echo "Installing packages..." >> summary.log
     PACK_LIST=(openssh-server dos2unix at net-tools gpm bridge-utils btrfs-progs xfsprogs ntp crash bc
-        libaio-devel libattr-devel keyutils-libs-devel nano kexec-tools device-mapper-multipath expect sysstat)
+        libaio-devel libattr-devel keyutils-libs-devel nano kexec-tools device-mapper-multipath expect sysstat git)
     for item in ${PACK_LIST[*]}
     do
         echo "Starting to install $item... "
         yum install $item -y
         verify_install $? $item
     done
+    yum groups mark install "Development Tools"
+    yum groups mark convert "Development Tools"
+    yum groupinstall "Development Tools"
+    verify_install $? "Development Tools"
  
     install_stressapptest
 
