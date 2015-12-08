@@ -407,6 +407,20 @@ if is_fedora ; then
         subscription-manager attach --auto
     fi
 
+    echo "Shutting down Network Manager on RHEL 7.x"
+    if [ $os_RELEASE -eq 7 ]; then 
+	    service NetworkManager stop
+	    if [ $? -ne 0 ]; then
+	    	echo "ERROR: Network Manager service didn't stop" >> summary.log
+	    fi
+	    chkconfig NetworkManager off
+	    service network start
+	    if [ $? -ne 0 ]; then
+	    	echo "ERROR: Network service didn't start" >> summary.log
+	    fi
+	    chkconfig network on
+	fi
+
     echo "Installing packages..." >> summary.log
     PACK_LIST=(openssh-server dos2unix at net-tools gpm bridge-utils btrfs-progs xfsprogs ntp crash bc
         libaio-devel libattr-devel keyutils-libs-devel nano kexec-tools device-mapper-multipath expect sysstat git)
