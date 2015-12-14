@@ -434,7 +434,11 @@ if is_fedora ; then
     yum groups mark convert "Development Tools"
     yum groupinstall "Development Tools"
     verify_install $? "Development Tools"
- 
+    wget bzip.org/1.0.3/bzip2-1.0.3.tar.gz
+    tar zxvf bzip2-1.0.3.tar.gz
+    cd bzip2-1.0.3
+    make install
+    cd ~
     install_stressapptest
 
     echo "Installing lis and mounting..."
