@@ -449,7 +449,7 @@ elif is_ubuntu ; then
     echo "Disable IPv6 for apt-get"
     echo "Acquire::ForceIPv4 "true";" > /etc/apt/apt.conf.d/99force-ipv4
     PACK_LIST=(kdump-tools openssh-server tofrodos dosfstools dos2unix ntp gcc open-iscsi iperf gpm vlan iozone3 at multipath-tools expect
-        make libattr1-dev stressapptest git bridge-utils btrfs-tools libkeyutils-dev xfsprogs linux-cloud-tools-common linux-tools-`uname -r` linux-cloud-tools-`uname -r` sysstat)
+        make libattr1-dev stressapptest git bridge-utils btrfs-tools libkeyutils-dev xfsprogs linux-cloud-tools-common linux-tools-`uname -r` linux-cloud-tools-`uname -r` sysstat build-essential)
     for item in ${PACK_LIST[*]}
     do
         echo "Starting to install $item... "
