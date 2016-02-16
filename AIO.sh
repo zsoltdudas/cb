@@ -407,8 +407,8 @@ if is_fedora ; then
         subscription-manager attach --auto
     fi
 
-    echo "Shutting down Network Manager on RHEL 7.x"
-    if [ $os_RELEASE -eq 7 ]; then 
+    echo "Shutting down Network Manager on RHEL 6.x/7.x"
+    if [ $os_RELEASE -eq 7 ] || [ $os_RELEASE -eq 6 ]; then 
 	    service NetworkManager stop
 	    if [ $? -ne 0 ]; then
 	    	echo "ERROR: Network Manager service didn't stop" >> summary.log
