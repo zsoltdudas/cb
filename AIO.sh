@@ -372,6 +372,7 @@ if is_fedora ; then
     fi
 
     chkconfig iptables off
+    chkconfig ip6tables off
     if [ $? == 0 ] ; then
         echo "iptables turned off" >> summary.log
     else
