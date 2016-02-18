@@ -449,6 +449,12 @@ elif is_ubuntu ; then
     echo "Starting the configuration..."
     echo "Disable IPv6 for apt-get"
     echo "Acquire::ForceIPv4 "true";" > /etc/apt/apt.conf.d/99force-ipv4
+#
+# Because Ubuntu has a 100 seconds delay waiting for a new network interface,
+# we're disabling the delays in order to not conflict with the automation
+#
+    sed -i -e 's/sleep 40/#sleep 40/g' /etc/init/failsafe.conf
+    sed -i -e 's/sleep 59/#sleep 59/g' /etc/init/failsafe.conf
     PACK_LIST=(kdump-tools openssh-server tofrodos dosfstools dos2unix ntp gcc open-iscsi iperf gpm vlan iozone3 at multipath-tools expect zip
         make libattr1-dev stressapptest git bridge-utils btrfs-tools libkeyutils-dev xfsprogs linux-cloud-tools-common linux-tools-`uname -r` linux-cloud-tools-`uname -r` sysstat build-essential)
     for item in ${PACK_LIST[*]}
