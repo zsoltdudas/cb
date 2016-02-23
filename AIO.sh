@@ -354,7 +354,11 @@ function configure_grub(){
 		fi	
 	fi
 }
-
+function remove_udev(){
+    echo "rm -r /etc/udev/rules.d/70-persistant-net.rules" >> /etc/init.d/removeUdev.sh
+    chmod +x /etc/init.d/removeUdev.sh
+    sed -i 's|exit 0$|/etc/init.d/removeUdev.sh\nexit 0|' /etc/rc.local    
+}
 #######################################################################
 #
 # Main script body
@@ -524,3 +528,4 @@ install_Stress_ng
 configure_grub
 rsa_keys rhel5_id_rsa
 configure_ssh
+remove_udev
