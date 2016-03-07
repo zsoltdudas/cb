@@ -354,11 +354,6 @@ function configure_grub(){
 		fi	
 	fi
 }
-function remove_udev(){
-    echo "rm -r /etc/udev/rules.d/70-persistant-net.rules" >> /etc/init.d/removeUdev.sh
-    chmod +x /etc/init.d/removeUdev.sh
-    sed -i 's|exit 0$|/etc/init.d/removeUdev.sh\nexit 0|' /etc/rc.local    
-}
 #######################################################################
 #
 # Main script body
@@ -468,6 +463,12 @@ elif is_ubuntu ; then
         verify_install $? $item
     done   
 
+    if [ -e /etc/multipath.conf ]; then
+            rm /etc/multipath.conf
+    fi
+    echo -e "blacklist {\n\tdevnode \"^sd[a-z]\"\n}" >> /etc/multipath.conf
+    service multipath-tools reload
+    service multipath-tools restart 
 elif is_suse ; then
 	# SLES ISO must be mounted for BETA releases
     chkconfig atd on
@@ -528,4 +529,3 @@ install_Stress_ng
 configure_grub
 rsa_keys rhel5_id_rsa
 configure_ssh
-remove_udev
