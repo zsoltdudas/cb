@@ -303,6 +303,8 @@ function verify_install (){
         echo "$2 was successfully installed." >> summary.log
     else
         echo "Error: failed to install $2" >> summary.log
+        failed_install=1
+        not_installed+=$2
     fi
 }
 
@@ -354,12 +356,26 @@ function configure_grub(){
 		fi	
 	fi
 }
+
+function remove_udev(){
+
+    if [ $1 -ne 0 ]; then
+        echo "Some packages failed to insall. Try to insall them manually and then remove udev rules right before shutdown."
+        echo "Some packages failed to insall. Try to insall them manually and then remove udev rules right before shutdown." >> summary.log
+    else
+        echo "VM will shutdown in 1 minute. You may create ICABase right after shutdown."
+        sleep 1m
+        rm -rf /etc/udev/rules.d/70-persistant-net.rule
+        shutdown now
+    fi
+}
 #######################################################################
 #
 # Main script body
 #
 #######################################################################
 
+failed_install=0
 if is_fedora ; then
     echo "Starting the configuration..."
 
@@ -523,9 +539,12 @@ elif is_suse ; then
     done
 
     install_stressapptest
+    verify_install $? stressapptest
 fi
 
 install_Stress_ng
+verify_install $? stress-ng
 configure_grub
 rsa_keys rhel5_id_rsa
 configure_ssh
+remove_udev $failed_install
