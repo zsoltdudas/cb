@@ -483,7 +483,6 @@ elif is_ubuntu ; then
             rm /etc/multipath.conf
     fi
     echo -e "blacklist {\n\tdevnode \"^sd[a-z]\"\n}" >> /etc/multipath.conf
-    service multipath-tools reload
     service multipath-tools restart 
 elif is_suse ; then
 	# SLES ISO must be mounted for BETA releases
