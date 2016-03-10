@@ -303,8 +303,6 @@ function verify_install (){
         echo "$2 was successfully installed." >> summary.log
     else
         echo "Error: failed to install $2" >> summary.log
-        failed_install=1
-        not_installed+=$2
     fi
 }
 
@@ -359,14 +357,13 @@ function configure_grub(){
 
 function remove_udev(){
 
-    if [ $1 -ne 0 ]; then
-        echo "Some packages failed to insall. Try to insall them manually and then remove udev rules right before shutdown."
-        echo "Some packages failed to insall. Try to insall them manually and then remove udev rules right before shutdown." >> summary.log
+    echo "#! /bin/bash" >> /etc/init.d/remove_udev
+    echo "/etc/udev/rules.d/70-persistant-net.rules" >> /etc/init.d/remove_udev
+    chmod 775 /etc/init.d/remove_udev
+    if is_suse ; then 
+        ln -s /etc/init.d/remove_udev /etc/init.d/rc0.d/S00remove_udev
     else
-        echo "VM will shutdown in 1 minute. You may create ICABase right after shutdown."
-        sleep 1m
-        rm -rf /etc/udev/rules.d/70-persistant-net.rule
-        shutdown now
+        ln -s /etc/init.d/remove_udev /etc/rc0.d/S00remove_udev
     fi
 }
 #######################################################################
@@ -375,7 +372,6 @@ function remove_udev(){
 #
 #######################################################################
 
-failed_install=0
 if is_fedora ; then
     echo "Starting the configuration..."
 
@@ -546,4 +542,4 @@ verify_install $? stress-ng
 configure_grub
 rsa_keys rhel5_id_rsa
 configure_ssh
-remove_udev $failed_install
+remove_udev
