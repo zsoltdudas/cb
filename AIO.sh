@@ -357,8 +357,8 @@ function configure_grub(){
 
 function remove_udev(){
 
-    echo "#! /bin/bash" >> /etc/init.d/remove_udev
-    echo "/etc/udev/rules.d/70-persistant-net.rules" >> /etc/init.d/remove_udev
+    echo "#!/bin/bash" >> /etc/init.d/remove_udev
+    echo "rm -rf /etc/udev/rules.d/70-persistant-net.rules" >> /etc/init.d/remove_udev
     chmod 775 /etc/init.d/remove_udev
     if is_suse ; then 
         ln -s /etc/init.d/remove_udev /etc/init.d/rc0.d/S00remove_udev
@@ -375,7 +375,6 @@ function remove_udev(){
 if is_fedora ; then
     echo "Starting the configuration..."
 
-    rm -r /etc/udev/rules.d/70-persistant-net.rules
     if [ $? == 0 ] ; then
         echo "/etc/udev/rules.d/70-persistant-net.rules successfully removed" >> summary.log
     else
@@ -435,7 +434,7 @@ if is_fedora ; then
 
     echo "Installing packages..." >> summary.log
     PACK_LIST=(openssh-server dos2unix at net-tools gpm bridge-utils btrfs-progs xfsprogs ntp crash bc
-        libaio-devel libattr-devel keyutils-libs-devel nano kexec-tools device-mapper-multipath expect sysstat git)
+        libaio-devel libattr-devel keyutils-libs-devel nano kexec-tools device-mapper-multipath expect sysstat git bc)
     for item in ${PACK_LIST[*]}
     do
         echo "Starting to install $item... "
@@ -467,7 +466,7 @@ elif is_ubuntu ; then
     sed -i -e 's/sleep 40/#sleep 40/g' /etc/init/failsafe.conf
     sed -i -e 's/sleep 59/#sleep 59/g' /etc/init/failsafe.conf
     PACK_LIST=(kdump-tools openssh-server tofrodos dosfstools dos2unix ntp gcc open-iscsi iperf gpm vlan iozone3 at multipath-tools expect zip
-        make libattr1-dev stressapptest git bridge-utils btrfs-tools libkeyutils-dev xfsprogs linux-cloud-tools-common linux-tools-`uname -r` linux-cloud-tools-`uname -r` sysstat build-essential)
+        make libattr1-dev stressapptest git bridge-utils btrfs-tools libkeyutils-dev xfsprogs linux-cloud-tools-common linux-tools-`uname -r` linux-cloud-tools-`uname -r` sysstat build-essential bc)
     for item in ${PACK_LIST[*]}
     do
         echo "Starting to install $item... "
@@ -525,7 +524,7 @@ elif is_suse ; then
     cp /usr/include/sys/xattr.h /usr/include/attr/xattr.h
 
 
-    PACK_LIST=(at dos2unix dosfstools git-core subversion ntp gcc gcc-c++ expect sysstat)
+    PACK_LIST=(at dos2unix dosfstools git-core subversion ntp gcc gcc-c++ expect sysstat bc)
     for item in ${PACK_LIST[*]}
     do
         echo "Starting to install $item... " >> summary.log
