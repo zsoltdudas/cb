@@ -57,7 +57,7 @@ function GetOSVersion {
         fi
     elif [[ -x $(which lsb_release 2>/dev/null) ]]; then
         os_VENDOR=$(lsb_release -i -s)
-        os_RELEASE=$(lsb_release -r -s)
+        os_RELEASE=$(lsb_release -r -s | head -c 1)
         os_UPDATE=""
         os_PACKAGE="rpm"
         if [[ "Debian,Ubuntu,LinuxMint" =~ $os_VENDOR ]]; then
@@ -375,12 +375,6 @@ function remove_udev(){
 if is_fedora ; then
     echo "Starting the configuration..."
 
-    if [ $? == 0 ] ; then
-        echo "/etc/udev/rules.d/70-persistant-net.rules successfully removed" >> summary.log
-    else
-        echo "ERROR: /etc/udev/rules.d/70-persistant-net.rules cannot be removed" >> summary.log
-    fi
-
     chkconfig iptables off
     chkconfig ip6tables off
     if [ $? == 0 ] ; then
@@ -409,11 +403,8 @@ if is_fedora ; then
 
     echo "os_RELEASE: $os_RELEASE" >> summary.log
     echo "os_UPDATE: $os_UPDATE" >> summary.log
-    if [[ $os_RELEASE == "6.0" ]] || \
-       [[ $os_RELEASE -eq 6 ]] && \
-       [[ $os_RELEASE -eq 0 ]]; then
-        rhnreg_ks --username $username --password $password
-    else 
+    rhnreg_ks --username $username --password $password
+    if [ $? -ne 0 ]; then
         subscription-manager register --username $username --password $password
         subscription-manager attach --auto
     fi
