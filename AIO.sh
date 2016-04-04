@@ -259,7 +259,7 @@ function install_lis(){
     echo "Mounting drive..." >> summary.log
     mount /dev/cdrom /media
     if [ $? -eq 0 ]; then
-        echo "cdrom was successfully mounted" >> summary.log 
+        echo "cdrom was successfully mounted" >> summary.log
         cd /media
         rpm -qa | grep microsoft
         if [ $? -eq 0 ]; then
@@ -308,14 +308,14 @@ function verify_install (){
 
 function install_stressapptest(){
 	echo "Installing stressapptest..." >> summary.log
-    
+
     svn checkout http://stressapptest.googlecode.com/svn/trunk/ stressapptest
     cd stressapptest
     ./configure
     make
     make install
     verify_install $? stressapptest
-    cd ~   
+    cd ~
 }
 
 function install_Stress_ng(){
@@ -333,7 +333,7 @@ function configure_grub(){
 	echo "Configuring GRUB..." >> summary.log
 	if is_ubuntu ; then
 		sed -i -e 's/DEFAULT=""/DEFAULT="console=tty0 console=ttyS1 crashkernel=256M@128M"/g' /etc/default/grub
-		update-grub	
+		update-grub
 	elif is_fedora ; then
 		if [ $os_RELEASE -eq 7 ] ; then
 			sed -i -e 's/crashkernel=auto/crashkernel=256M@128M console=tty0 console=ttyS1/g' /etc/default/grub
@@ -342,7 +342,7 @@ function configure_grub(){
 		elif [ $os_RELEASE -eq 6 ] ; then
 			sed -i -e 's/crashkernel=auto/crashkernel=256M@128M console=tty0 console=ttyS1/g' /boot/grub/grub.conf
 		    perl -pi -e "s/quiet//g" /boot/grub/grub.conf
-        fi	
+        fi
 	elif is_suse ; then
 		if [ $os_RELEASE -eq 12 ] ; then
 			sed -i -e 's/218M-:109M/256M@128M console=tty0 console=ttyS1/g' /etc/default/grub
@@ -351,7 +351,7 @@ function configure_grub(){
 		elif [ $os_RELEASE -eq 11 ]	; then
 			sed -i -e 's/256M-:128M/256M@128M console=tty0 console=ttyS1/g' /boot/grub/menu.lst
             perl -pi -e "s/splash=silent//g" /boot/grub/menu.lst
-		fi	
+		fi
 	fi
 }
 
@@ -360,7 +360,7 @@ function remove_udev(){
     echo "#!/bin/bash" >> /etc/init.d/remove_udev
     echo "rm -rf /etc/udev/rules.d/70-persistant-net.rules" >> /etc/init.d/remove_udev
     chmod 775 /etc/init.d/remove_udev
-    if is_suse ; then 
+    if is_suse ; then
         ln -s /etc/init.d/remove_udev /etc/init.d/rc0.d/S00remove_udev
     else
         ln -s /etc/init.d/remove_udev /etc/rc0.d/S00remove_udev
@@ -385,8 +385,8 @@ if is_fedora ; then
 
     if [ $os_RELEASE -eq 6 ]; then
         echo "Changing ONBOOT..."
-        sed -i -e 's/ONBOOT=no/ONBOOT=yes/g' /etc/sysconfig/network-scripts/ifcfg-eth0 
-        echo "Turning off selinux..." 
+        sed -i -e 's/ONBOOT=no/ONBOOT=yes/g' /etc/sysconfig/network-scripts/ifcfg-eth0
+        echo "Turning off selinux..."
         echo 0 > /selinux/enforce
         echo "selinux=0" >> /boot/grub/grub.conf
         sed -i -e 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/selinux/config
@@ -410,7 +410,7 @@ if is_fedora ; then
     fi
 
     echo "Shutting down Network Manager on RHEL 6.x/7.x"
-    if [ $os_RELEASE -eq 7 ] || [ $os_RELEASE -eq 6 ]; then 
+    if [ $os_RELEASE -eq 7 ] || [ $os_RELEASE -eq 6 ]; then
 	    service NetworkManager stop
 	    if [ $? -ne 0 ]; then
 	    	echo "ERROR: Network Manager service didn't stop" >> summary.log
@@ -425,7 +425,7 @@ if is_fedora ; then
 
     echo "Installing packages..." >> summary.log
     PACK_LIST=(openssh-server dos2unix at net-tools gpm bridge-utils btrfs-progs xfsprogs ntp crash bc
-        libaio-devel libattr-devel keyutils-libs-devel nano kexec-tools device-mapper-multipath expect sysstat git bc)
+        libaio-devel libattr-devel keyutils-libs-devel nano kexec-tools device-mapper-multipath expect sysstat git bc numactl)
     for item in ${PACK_LIST[*]}
     do
         echo "Starting to install $item... "
@@ -457,19 +457,20 @@ elif is_ubuntu ; then
     sed -i -e 's/sleep 40/#sleep 40/g' /etc/init/failsafe.conf
     sed -i -e 's/sleep 59/#sleep 59/g' /etc/init/failsafe.conf
     PACK_LIST=(kdump-tools openssh-server tofrodos dosfstools dos2unix ntp gcc open-iscsi iperf gpm vlan iozone3 at multipath-tools expect zip
-        make libattr1-dev stressapptest git bridge-utils btrfs-tools libkeyutils-dev xfsprogs linux-cloud-tools-common linux-tools-`uname -r` linux-cloud-tools-`uname -r` sysstat build-essential bc)
+        make libattr1-dev stressapptest git bridge-utils btrfs-tools libkeyutils-dev xfsprogs linux-cloud-tools-common linux-tools-`uname -r` linux-cloud-tools-`uname -r` sysstat build-essential bc
+        numactl)
     for item in ${PACK_LIST[*]}
     do
         echo "Starting to install $item... "
         apt-get install $item -y
         verify_install $? $item
-    done   
+    done
 
     if [ -e /etc/multipath.conf ]; then
             rm /etc/multipath.conf
     fi
     echo -e "blacklist {\n\tdevnode \"^sd[a-z]\"\n}" >> /etc/multipath.conf
-    service multipath-tools restart 
+    service multipath-tools restart
 elif is_suse ; then
 	# SLES ISO must be mounted for BETA releases
     chkconfig atd on
@@ -495,7 +496,7 @@ elif is_suse ; then
         #Adding repo for SVN
         zypper addrepo http://download.opensuse.org/repositories/devel:tools:scm:svn/SLE_11_SP4/devel:tools:scm:svn.repo
         zypper --no-gpg-checks refresh
-       
+
     else
     	echo "ERROR: Unsupported version of SLES!" >> summary.log
     fi
@@ -509,17 +510,17 @@ elif is_suse ; then
     make
     make install
     cd ~
-    
+
     #Second one is xattr. Just moving the file where stress-ng is searching for it
     mkdir /usr/include/attr/
     cp /usr/include/sys/xattr.h /usr/include/attr/xattr.h
 
 
-    PACK_LIST=(at dos2unix dosfstools git-core subversion ntp gcc gcc-c++ expect sysstat bc)
+    PACK_LIST=(at dos2unix dosfstools git-core subversion ntp gcc gcc-c++ expect sysstat bc numactl)
     for item in ${PACK_LIST[*]}
     do
         echo "Starting to install $item... " >> summary.log
-        zypper --non-interactive in $item 
+        zypper --non-interactive in $item
         verify_install $? $item
     done
 
