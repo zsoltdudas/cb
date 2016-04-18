@@ -445,6 +445,14 @@ if is_fedora ; then
 
     echo "Installing lis and mounting..."
     install_lis
+    if [ -e /boot/efi ]; then
+        cp -r /boot/efi/EFI/redhat/ /boot/efi/EFI/BOOT
+        if [ -e /boot/efi/EFI/boot/shim-redhat.efi ]; then 
+            mv /boot/efi/EFI/boot/shim-redhat.efi /boot/efi/EFI/boot/bootx64.efi
+        else
+            mv /boot/efi/EFI/BOOT/shim.efi /boot/efi/EFI/BOOT/bootx64.efi
+        fi
+    fi
 
 elif is_ubuntu ; then
     echo "Starting the configuration..."
@@ -471,6 +479,14 @@ elif is_ubuntu ; then
     fi
     echo -e "blacklist {\n\tdevnode \"^sd[a-z]\"\n}" >> /etc/multipath.conf
     service multipath-tools restart
+    if [ -e /boot/efi ]; then
+        cp -r /boot/efi/EFI/ubuntu/ /boot/efi/EFI/boot
+        if [ -e /boot/efi/EFI/boot/shimx64.efi ]; then
+            mv /boot/efi/EFI/boot/shimx64.efi /boot/efi/EFI/boot/bootx64.efi
+        elif [ -e /boot/efi/EFI/boot/grubx64.efi ]; then
+            mv /boot/efi/EFI/boot/grubx64.efi /boot/efi/EFI/boot/bootx64.efi
+        fi
+    fi
 elif is_suse ; then
 	# SLES ISO must be mounted for BETA releases
     chkconfig atd on
@@ -526,6 +542,22 @@ elif is_suse ; then
 
     install_stressapptest
     verify_install $? stressapptest
+    if [ -e /boot/efi ]; then
+        if [ -e /boot/efi/SuSE ]; then
+            cp –r /boot/efi/efi/SuSE/ /boot/efi/EFI/boot
+        elif [ -e /boot/efi/opensuse ]; then
+            cp –r /boot/efi/efi/opensuse/ /boot/efi/EFI/boot
+        fi
+        if  [ -e /boot/efi/EFI/BOOT/shim.efi ]; then
+            mv /boot/efi/EFI/BOOT/shim.efi /boot/efi/EFI/boot/bootx64.efi
+        elif [ -e /boot/efi/EFI/BOOT/grubx64.efi ]; then
+            mv /boot/efi/EFI/BOOT/grubx64.efi /boot/efi/EFI/boot/bootx64.efi
+        elif [ -e /boot/efi/EFI/BOOT/elilo.efi]; then
+            mv /boot/efi/EFI/BOOT/elilo.efi /boot/efi/EFI/boot/bootx64.efi
+       
+        fi
+
+    fi
 fi
 
 install_Stress_ng
@@ -534,3 +566,4 @@ configure_grub
 rsa_keys rhel5_id_rsa
 configure_ssh
 remove_udev
+
