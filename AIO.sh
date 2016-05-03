@@ -357,7 +357,7 @@ function configure_grub(){
 function remove_udev(){
 
     echo "#!/bin/bash" >> /etc/init.d/remove_udev
-    echo "rm -rf /etc/udev/rules.d/70-persistant-net.rules" >> /etc/init.d/remove_udev
+    echo "rm -rf /etc/udev/rules.d/70-persistent-net.rules" >> /etc/init.d/remove_udev
     chmod 775 /etc/init.d/remove_udev
     if is_suse ; then
         ln -s /etc/init.d/remove_udev /etc/init.d/rc0.d/S00remove_udev
