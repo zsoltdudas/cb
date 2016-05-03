@@ -464,13 +464,12 @@ if is_fedora ; then
 
     echo "Installing lis and mounting..."
     install_lis
+    
     if [ -e /boot/efi ]; then
-        cp -r /boot/efi/EFI/redhat/ /boot/efi/EFI/BOOT
-        if [ -e /boot/efi/EFI/boot/shim-redhat.efi ]; then 
-            mv /boot/efi/EFI/boot/shim-redhat.efi /boot/efi/EFI/boot/bootx64.efi
-        else
-            mv /boot/efi/EFI/BOOT/shim.efi /boot/efi/EFI/BOOT/bootx64.efi
-        fi
+        mkdir /boot/efi/EFI/boot/
+        cp /boot/efi/EFI/redhat/grub.efi /boot/efi/EFI/boot/bootx64.efi
+        cp /boot/efi/EFI/redhat/grub.conf /boot/efi/EFI/boot/bootx64.conf
+        
     fi
 
 elif is_ubuntu ; then
