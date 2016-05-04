@@ -372,7 +372,7 @@ function remove_udev(){
 #######################################################################
 if is_fedora ; then
     echo "Starting the configuration..."
-
+    chkconfig irqbalance off
     chkconfig iptables off
     chkconfig ip6tables off
     if [ $? == 0 ] ; then
