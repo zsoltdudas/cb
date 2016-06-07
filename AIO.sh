@@ -308,7 +308,7 @@ function verify_install (){
 function install_stressapptest(){
 	echo "Installing stressapptest..." >> summary.log
 
-    svn checkout http://stressapptest.googlecode.com/svn/trunk/ stressapptest
+    git clone https://github.com/stressapptest/stressapptest.git
     cd stressapptest
     ./configure
     make
