@@ -565,10 +565,6 @@ elif is_suse ; then
     make install
     cd ~
 
-    #Second one is xattr. Just moving the file where stress-ng is searching for it
-    mkdir /usr/include/attr/
-    cp /usr/include/sys/xattr.h /usr/include/attr/xattr.h
-
     PACK_LIST=(at dos2unix dosfstools git-core subversion ntp gcc gcc-c++ expect sysstat bc numactl python3)
     for item in ${PACK_LIST[*]}
     do
