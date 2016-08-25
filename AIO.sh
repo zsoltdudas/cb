@@ -400,7 +400,10 @@ if is_fedora ; then
     else
         echo "ERROR: iptables cannot be turned off" >> summary.log
     fi
-
+    
+    # Removing /var/log/messages
+    rm -f /var/log/messages
+    
     if [ $os_RELEASE -eq 6 ]; then
         echo "Changing ONBOOT..."
         sed -i -e 's/ONBOOT=no/ONBOOT=yes/g' /etc/sysconfig/network-scripts/ifcfg-eth0
@@ -496,6 +499,9 @@ elif is_ubuntu ; then
     echo "Starting the configuration..."
     echo "Disable IPv6 for apt-get"
     echo "Acquire::ForceIPv4 "true";" > /etc/apt/apt.conf.d/99force-ipv4
+    
+    # Removing /var/log/syslog
+    rm -f /var/log/syslog*
 #
 # Because Ubuntu has a 100 seconds delay waiting for a new network interface,
 # we're disabling the delays in order to not conflict with the automation
@@ -529,6 +535,10 @@ elif is_suse ; then
 	# SLES ISO must be mounted for BETA releases
     chkconfig atd on
     service atd start
+    
+    # Removing /var/log/messages
+    rm -f /var/log/messages
+    
     echo "Registering the system..." >> summary.log
     if [ $# -ne 2 ]; then
         echo "ERRROR: Incorrect number of arguments!" >> summary.log
