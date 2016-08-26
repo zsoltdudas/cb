@@ -332,44 +332,24 @@ function configure_grub(){
 	echo "Configuring GRUB..." >> summary.log
 	if is_ubuntu ; then
 		sed -i -e 's/DEFAULT=""/DEFAULT="console=tty0 console=ttyS1 crashkernel=256M@128M"/g' /etc/default/grub
-        grep elevator=noop /etc/default/grub > /dev/null
-        if [ $? -ne 0 ] ; then
-            grep crashkernel /etc/default/grub | while read -r line; do x="$line elevator=noop"; sed -i "s,$line,$x,g" /etc/default/grub; done
-        fi
-		update-grub
+        update-grub
 	elif is_fedora ; then
 		if [ $os_RELEASE -eq 7 ] ; then
 			sed -i -e 's/crashkernel=auto/crashkernel=256M@128M console=tty0 console=ttyS1/g' /etc/default/grub
 			perl -pi -e "s/quiet//g" /etc/default/grub
-            grep elevator=noop /etc/default/grub > /dev/null
-            if [ $? -ne 0 ] ; then
-                grep crashkernel /etc/default/grub | while read -r line; do x="$line elevator=noop"; sed -i "s,$line,$x,g" /etc/default/grub; done
-            fi
             grub2-mkconfig -o /etc/grub2.cfg
 		elif [ $os_RELEASE -eq 6 ] ; then
 			sed -i -e 's/crashkernel=auto/crashkernel=256M@128M console=tty0 console=ttyS1/g' /boot/grub/grub.conf
 		    perl -pi -e "s/quiet//g" /boot/grub/grub.conf
-            grep elevator=noop /boot/grub/grub.conf > /dev/null
-            if [ $? -ne 0 ] ; then
-                grep crashkernel /boot/grub/grub.conf | while read -r line; do x="$line elevator=noop"; sed -i "s,$line,$x,g" /boot/grub/grub.conf; done
-            fi
         fi
 	elif is_suse ; then
 		if [ $os_RELEASE -eq 12 ] ; then
 			sed -i -e 's/218M-:109M/256M@128M console=tty0 console=ttyS1/g' /etc/default/grub
 			perl -pi -e "s/quiet//g" /etc/default/grub
-            grep elevator=noop /etc/default/grub > /dev/null
-            if [ $? -ne 0 ] ; then
-                grep crashkernel /etc/default/grub | while read -r line; do x="$line elevator=noop"; sed -i "s,$line,$x,g" /etc/default/grub; done
-            fi
             grub2-mkconfig -o /etc/grub2.cfg
 		elif [ $os_RELEASE -eq 11 ]	; then
 			sed -i -e 's/256M-:128M/256M@128M console=tty0 console=ttyS1/g' /boot/grub/menu.lst
             perl -pi -e "s/splash=silent//g" /boot/grub/menu.lst
-            grep elevator=noop /boot/grub/menu.lst > /dev/null
-            if [ $? -ne 0 ] ; then
-                grep crashkernel /boot/grub/menu.lst | while read -r line; do x="$line elevator=noop"; sed -i "s,$line,$x,g" /boot/grub/menu.lst; done
-            fi
 		fi
 	fi
 }
