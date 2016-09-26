@@ -380,10 +380,10 @@ if is_fedora ; then
     else
         echo "ERROR: iptables cannot be turned off" >> summary.log
     fi
-    
+
     # Removing /var/log/messages
     rm -f /var/log/messages
-    
+
     if [ $os_RELEASE -eq 6 ]; then
         echo "Changing ONBOOT..."
         sed -i -e 's/ONBOOT=no/ONBOOT=yes/g' /etc/sysconfig/network-scripts/ifcfg-eth0
@@ -467,19 +467,19 @@ if is_fedora ; then
 
     echo "Installing lis and mounting..."
     install_lis
-    
+
     if [ -e /boot/efi ]; then
         mkdir /boot/efi/EFI/boot/
         cp /boot/efi/EFI/redhat/grub.efi /boot/efi/EFI/boot/bootx64.efi
         cp /boot/efi/EFI/redhat/grub.conf /boot/efi/EFI/boot/bootx64.conf
-        
+
     fi
 
 elif is_ubuntu ; then
     echo "Starting the configuration..."
     echo "Disable IPv6 for apt-get"
     echo "Acquire::ForceIPv4 "true";" > /etc/apt/apt.conf.d/99force-ipv4
-    
+
     # Removing /var/log/syslog
     rm -f /var/log/syslog*
 #
@@ -515,10 +515,10 @@ elif is_suse ; then
 	# SLES ISO must be mounted for BETA releases
     chkconfig atd on
     service atd start
-    
+
     # Removing /var/log/messages
     rm -f /var/log/messages
-    
+
     echo "Registering the system..." >> summary.log
     if [ $# -ne 2 ]; then
         echo "ERRROR: Incorrect number of arguments!" >> summary.log
@@ -577,7 +577,7 @@ elif is_suse ; then
             mv /boot/efi/EFI/BOOT/grubx64.efi /boot/efi/EFI/boot/bootx64.efi
         elif [ -e /boot/efi/EFI/BOOT/elilo.efi]; then
             mv /boot/efi/EFI/BOOT/elilo.efi /boot/efi/EFI/boot/bootx64.efi
-       
+
         fi
 
     fi
@@ -586,7 +586,7 @@ fi
 install_Stress_ng
 verify_install $? stress-ng
 configure_grub
-rsa_keys rhel5_id_rsa
-configure_ssh
+# rsa_keys rhel5_id_rsa
+# configure_ssh
 remove_udev
 
